@@ -1,35 +1,98 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:csv/csv.dart';
+
 import '../models/topic.dart';
 
 class CsvLoader {
-  static final _converter = const CsvToListConverter(shouldParseNumbers: false);
-
   static Future<List<Topic>> loadFromAsset(String assetPath) async {
-    final data = await rootBundle.loadString(assetPath);
-    final rows = _converter.convert(data);
+    try {
+      final data = await rootBundle.loadString(assetPath);
+      final rows = _parseCsv(data);
 
-    if (rows.isEmpty) return [];
+      if (rows.isEmpty) return [];
 
-    final headers = rows.first.map((h) => h.toString().trim()).toList();
-    final topics = <Topic>[];
+      final headers = rows.first;
+      final topics = <Topic>[];
 
-    for (var i = 1; i < rows.length; i++) {
-      final row = rows[i];
-      if (row.isEmpty || row.every((cell) => cell.toString().trim().isEmpty)) continue;
+      for (var i = 1; i < rows.length; i++) {
+        final row = rows[i];
+        if (row.isEmpty || row.every((cell) => cell.trim().isEmpty)) continue;
 
-      final map = <String, String>{};
-      for (var j = 0; j < headers.length && j < row.length; j++) {
-        map[headers[j]] = row[j].toString().trim();
+        final map = <String, String>{};
+        for (var j = 0; j < headers.length && j < row.length; j++) {
+          map[headers[j]] = row[j].trim();
+        }
+
+        final id = map['Id'] ?? '';
+        final title = map['Title'] ?? '';
+        if (id.isEmpty || title.isEmpty) continue;
+
+        topics.add(Topic.fromCsvRow(map));
       }
 
-      final id = map['Id'] ?? '';
-      final title = map['Title'] ?? '';
-      if (id.isEmpty || title.isEmpty) continue;
+      return topics;
+    } catch (e) {
+      debugPrint('CsvLoader error for $assetPath: $e');
+      return [];
+    }
+  }
 
-      topics.add(Topic.fromCsvRow(map));
+  static List<List<String>> _parseCsv(String text) {
+    final rows = <List<String>>[];
+    final currentRow = <String>[];
+    var currentField = StringBuffer();
+    var inQuotes = false;
+    var i = 0;
+
+    while (i < text.length) {
+      final c = text[i];
+
+      if (inQuotes) {
+        if (c == '"') {
+          if (i + 1 < text.length && text[i + 1] == '"') {
+            currentField.write('"');
+            i += 2;
+          } else {
+            inQuotes = false;
+            i++;
+          }
+        } else {
+          currentField.write(c);
+          i++;
+        }
+      } else {
+        if (c == '"') {
+          inQuotes = true;
+          i++;
+        } else if (c == ',') {
+          currentRow.add(currentField.toString());
+          currentField = StringBuffer();
+          i++;
+        } else if (c == '\r') {
+          currentRow.add(currentField.toString());
+          currentField = StringBuffer();
+          if (i + 1 < text.length && text[i + 1] == '\n') i++;
+          i++;
+          rows.add(List<String>.from(currentRow));
+          currentRow.clear();
+        } else if (c == '\n') {
+          currentRow.add(currentField.toString());
+          currentField = StringBuffer();
+          i++;
+          rows.add(List<String>.from(currentRow));
+          currentRow.clear();
+        } else {
+          currentField.write(c);
+          i++;
+        }
+      }
     }
 
-    return topics;
+    if (currentField.isNotEmpty || currentRow.isNotEmpty) {
+      currentRow.add(currentField.toString());
+      rows.add(List<String>.from(currentRow));
+    }
+
+    return rows;
   }
 }

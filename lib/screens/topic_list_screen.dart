@@ -49,7 +49,9 @@ class _TopicListScreenState extends State<TopicListScreen> {
       try {
         final loaded = await TopicCache.instance.get(path);
         topics.addAll(loaded);
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('TopicList: error loading $path: $e');
+      }
     }
     if (mounted) {
       setState(() {

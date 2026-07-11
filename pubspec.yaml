@@ -10,15 +10,23 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.1.1
-  csv: ^6.0.0
   shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1
 
 flutter:
   uses-material-design: true
   assets:
     - assets/questions/
+    - assets/icons/
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#1A2980"
+  adaptive_icon_foreground: "assets/icons/android_512.png"

@@ -39,7 +39,9 @@ class _PaperListScreenState extends State<PaperListScreen> {
         try {
           final topics = await TopicCache.instance.get(path);
           ids.addAll(topics.map((t) => t.id));
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('PaperList: error loading $path: $e');
+        }
       }
       _paperTopicIds[paper.directoryName] = ids;
     }
