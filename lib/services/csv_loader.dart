@@ -3,7 +3,7 @@ import 'package:csv/csv.dart';
 import '../models/topic.dart';
 
 class CsvLoader {
-  static final _converter = CsvToListConverter(shouldParseNumbers: false);
+  static final _converter = const CsvToListConverter(shouldParseNumbers: false);
 
   static Future<List<Topic>> loadFromAsset(String assetPath) async {
     final data = await rootBundle.loadString(assetPath);

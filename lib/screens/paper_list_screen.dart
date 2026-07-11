@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/paper.dart';
 import '../providers/progress_provider.dart';
 import '../services/asset_registry.dart';
 import '../services/topic_cache.dart';
