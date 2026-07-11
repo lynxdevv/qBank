@@ -21,8 +21,57 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/questions/
     - assets/icons/
+    - assets/questions/Pathology/paper1/Cell Injury, Cell Death and Adaptations.csv
+    - assets/questions/Pathology/paper1/Environmental and Nutritional Disorders.csv
+    - assets/questions/Pathology/paper1/Genetic disorders.csv
+    - assets/questions/Pathology/paper1/Hemodynamic Disorders, Thromboembolism and Shock.csv
+    - assets/questions/Pathology/paper1/Immunology.csv
+    - assets/questions/Pathology/paper1/Infancy and Diseases of Childhood.csv
+    - assets/questions/Pathology/paper1/Infectious Diseases.csv
+    - assets/questions/Pathology/paper1/Inflammation and Repair.csv
+    - assets/questions/Pathology/paper1/Neoplasia.csv
+    - assets/questions/Pathology/paper1/Platelets.csv
+    - assets/questions/Pathology/paper1/Red Blood Cells.csv
+    - assets/questions/Pathology/paper1/The Cell as a Unit of Health and Disease.csv
+    - assets/questions/Pathology/paper1/White Blood Cells.csv
+    - assets/questions/Pathology/paper2/Blood Vessels.csv
+    - assets/questions/Pathology/paper2/Bones, Joints and Soft Tissue Tumors.csv
+    - assets/questions/Pathology/paper2/Breast.csv
+    - assets/questions/Pathology/paper2/Central Nervous System.csv
+    - assets/questions/Pathology/paper2/Endocrinology.csv
+    - assets/questions/Pathology/paper2/Female Genital Tract.csv
+    - assets/questions/Pathology/paper2/Gastrointestinal System.csv
+    - assets/questions/Pathology/paper2/Head and Neck.csv
+    - assets/questions/Pathology/paper2/Heart.csv
+    - assets/questions/Pathology/paper2/Kidney.csv
+    - assets/questions/Pathology/paper2/Liver, Gall bladder and Pancreas.csv
+    - assets/questions/Pathology/paper2/Male Genital Tract.csv
+    - assets/questions/Pathology/paper2/Respiratory System.csv
+    - assets/questions/Pathology/paper2/Skin.csv
+    - assets/questions/Pharmacology/paper1/Autacoids.csv
+    - assets/questions/Pharmacology/paper1/Autonomic Nervous System.csv
+    - assets/questions/Pharmacology/paper1/Cardiovascular System.csv
+    - assets/questions/Pharmacology/paper1/Central Nervous System.csv
+    - assets/questions/Pharmacology/paper1/General Pharmacology.csv
+    - assets/questions/Pharmacology/paper1/Peripheral Nervous System.csv
+    - assets/questions/Pharmacology/paper1/Respiratory System.csv
+    - assets/questions/Pharmacology/paper2/Anti-Microbial Drugs.csv
+    - assets/questions/Pharmacology/paper2/Gastrointestinal System.csv
+    - assets/questions/Pharmacology/paper2/Hormones.csv
+    - assets/questions/Pharmacology/paper2/Miscellaneous Drugs.csv
+    - assets/questions/Pharmacology/paper2/Neoplastic Drugs.csv
+    - assets/questions/Microbiology/paper1/General Microbiology.csv
+    - assets/questions/Microbiology/paper1/Hospital Infection Control.csv
+    - assets/questions/Microbiology/paper1/Immunology.csv
+    - assets/questions/Microbiology/paper1/Miscellaneous Bacteria and Microbial Zoonotic diseases.csv
+    - assets/questions/Microbiology/paper1/Skin, Soft tissues and Musculoskeletal System Infections.csv
+    - assets/questions/Microbiology/paper2/Bloodstream and Cardiovascular Infections.csv
+    - assets/questions/Microbiology/paper2/Central Nervous System Infections.csv
+    - assets/questions/Microbiology/paper2/Gastrointestinal Infections.csv
+    - assets/questions/Microbiology/paper2/Genito-Urinary and Sexually Transmitted Infections.csv
+    - assets/questions/Microbiology/paper2/Hepatobiliary Infections.csv
+    - assets/questions/Microbiology/paper2/Respiratory Tract Infections.csv
 
 flutter_launcher_icons:
   android: true
