@@ -6,12 +6,15 @@ import '../models/topic.dart';
 class CsvLoader {
   static Future<List<Topic>> loadFromAsset(String assetPath) async {
     try {
-      final data = await rootBundle.loadString(assetPath);
-      final rows = _parseCsv(data);
+      var data = await rootBundle.loadString(assetPath);
+      if (data.isNotEmpty && data.codeUnitAt(0) == 0xFEFF) {
+        data = data.substring(1);
+      }
 
+      final rows = _parseCsv(data);
       if (rows.isEmpty) return [];
 
-      final headers = rows.first;
+      final headers = rows.first.map((h) => h.trim().replaceAll('\uFEFF', '')).toList();
       final topics = <Topic>[];
 
       for (var i = 1; i < rows.length; i++) {
@@ -20,16 +23,21 @@ class CsvLoader {
 
         final map = <String, String>{};
         for (var j = 0; j < headers.length && j < row.length; j++) {
-          map[headers[j]] = row[j].trim();
+          final key = headers[j];
+          if (key.isEmpty) continue;
+          map[key] = row[j].trim();
         }
 
-        final id = map['Id'] ?? '';
-        final title = map['Title'] ?? '';
+        final id = map['Id'] ?? map['id'] ?? '';
+        final title = map['Title'] ?? map['title'] ?? '';
         if (id.isEmpty || title.isEmpty) continue;
 
         topics.add(Topic.fromCsvRow(map));
       }
 
+      if (topics.isEmpty) {
+        debugPrint('CsvLoader warning: loaded zero topics from $assetPath');
+      }
       return topics;
     } catch (e) {
       debugPrint('CsvLoader error for $assetPath: $e');

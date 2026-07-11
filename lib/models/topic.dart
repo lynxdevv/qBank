@@ -93,17 +93,21 @@ class Topic {
   }
 
   factory Topic.fromCsvRow(Map<String, String> row) {
-    final rawId = row['Id'] ?? '';
+    String lookup(String key) {
+      return row[key] ?? row[key.toLowerCase()] ?? row[key.replaceAll(RegExp(r'[^A-Za-z]'), '')] ?? '';
+    }
+
+    final rawId = lookup('Id');
     final type = rawId.startsWith('E_') ? TopicType.essay : TopicType.short;
 
-    final yearsRaw = row['YearsAsked'] ?? '';
+    final yearsRaw = lookup('YearsAsked');
     final years = yearsRaw
         .split(';')
         .map((y) => y.trim())
         .where((y) => y.isNotEmpty)
         .toList();
 
-    final refsRaw = row['References'] ?? '';
+    final refsRaw = lookup('References');
     final refs = refsRaw
         .split(';')
         .map((r) => r.trim())
@@ -113,12 +117,12 @@ class Topic {
 
     return Topic(
       id: rawId,
-      title: row['Title'] ?? '',
-      descriptions: row['Descriptions'],
-      hasPreviouslyBeenAsked: (row['HasPreviouslyBeenAsked'] ?? '').toLowerCase() == 'true',
-      importance: int.tryParse(row['Importance'] ?? '0') ?? 0,
+      title: lookup('Title'),
+      descriptions: lookup('Descriptions').isEmpty ? null : lookup('Descriptions'),
+      hasPreviouslyBeenAsked: lookup('HasPreviouslyBeenAsked').toLowerCase() == 'true',
+      importance: int.tryParse(lookup('Importance')) ?? 0,
       yearsAsked: years,
-      probableCases: row['ProbableCases'],
+      probableCases: lookup('ProbableCases').isEmpty ? null : lookup('ProbableCases'),
       references: refs,
       type: type,
     );
