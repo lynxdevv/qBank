@@ -25,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<List<String>> _subjectTopicIds = [];
   bool _loading = true;
+  String? _loadError;
 
   @override
   void initState() {
@@ -34,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadAllTopicIds() async {
     final allIds = <List<String>>[];
+    final errors = <String>[];
+
     for (final subject in AssetRegistry.subjects) {
       final ids = <String>[];
       for (final paper in subject.papers) {
@@ -47,7 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
             final topics = await TopicCache.instance.get(path);
             ids.addAll(topics.map((t) => t.id));
           } catch (e) {
-            debugPrint('Error loading $path: $e');
+            final msg = 'Error loading $path: $e';
+            debugPrint(msg);
+            errors.add(msg);
           }
         }
       }
@@ -57,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _subjectTopicIds = allIds;
         _loading = false;
+        _loadError = errors.isEmpty ? null : errors.join('\n');
       });
     }
   }
@@ -73,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GradientScaffold(
       appBar: AppBar(
         title: const Text(
-          'qBank Lynx',
+          'qBank 2',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
@@ -90,6 +96,70 @@ class _HomeScreenState extends State<HomeScreen> {
           : ListView(
               padding: const EdgeInsets.only(top: 8, bottom: 32),
               children: [
+                if (_loadError != null)
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingMedium,
+                      vertical: 8,
+                    ),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withAlpha(30),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusSmall),
+                      border: Border.all(color: Colors.red.withAlpha(80)),
+                    ),
+                    child: Text(
+                      'Some files failed to load. Check debug console.',
+                      style: TextStyle(
+                        color: Colors.red[300],
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                if (totalTopics == 0 && !_loading)
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingMedium,
+                      vertical: 8,
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withAlpha(30),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusSmall),
+                      border: Border.all(color: Colors.orange.withAlpha(80)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'No topics loaded',
+                          style: TextStyle(
+                            color: Colors.orange[300],
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Run "flutter clean" then "flutter run" to rebuild assets.',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Subjects: ${AssetRegistry.subjects.map((s) => s.displayName).join(", ")}',
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 _OverallProgress(
                   done: totalDone,
                   total: totalTopics,

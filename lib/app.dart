@@ -12,7 +12,7 @@ class QBanLynxApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ProgressProvider()..load(),
       child: MaterialApp(
-        title: 'qBank Lynx',
+        title: 'qBank 2',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           brightness: Brightness.dark,
