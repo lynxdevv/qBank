@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/topic_type.dart';
 import '../utils/constants.dart';
 
-enum SortOption { importance, recent, alphabetical }
+enum SortOption { timesAsked, importance, recent, alphabetical }
 
 class FilterBar extends StatelessWidget {
   final TopicType? selectedType;
@@ -52,6 +52,10 @@ class FilterBar extends StatelessWidget {
             onSelected: onSortChanged,
             color: AppColors.surfaceLight,
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: SortOption.timesAsked,
+                child: Text('Times Asked', style: TextStyle(color: AppColors.textPrimary)),
+              ),
               const PopupMenuItem(
                 value: SortOption.importance,
                 child: Text('Importance', style: TextStyle(color: AppColors.textPrimary)),

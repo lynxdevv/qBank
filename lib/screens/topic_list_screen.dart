@@ -26,7 +26,7 @@ class TopicListScreen extends StatefulWidget {
 
 class _TopicListScreenState extends State<TopicListScreen> {
   TopicType? _selectedType;
-  SortOption _sortOption = SortOption.importance;
+  SortOption _sortOption = SortOption.timesAsked;
   List<Topic> _allTopics = [];
   bool _loading = true;
 
@@ -61,6 +61,17 @@ class _TopicListScreenState extends State<TopicListScreen> {
     }
 
     switch (_sortOption) {
+      case SortOption.timesAsked:
+        if (_selectedType == null) {
+          final essays = topics.where((t) => t.type == TopicType.essay).toList()
+            ..sort((a, b) => b.timesAsked.compareTo(a.timesAsked));
+          final shorts = topics.where((t) => t.type == TopicType.short).toList()
+            ..sort((a, b) => b.timesAsked.compareTo(a.timesAsked));
+          topics = [...essays, ...shorts];
+        } else {
+          topics.sort((a, b) => b.timesAsked.compareTo(a.timesAsked));
+        }
+        break;
       case SortOption.importance:
         topics.sort((a, b) => b.importance.compareTo(a.importance));
         break;
