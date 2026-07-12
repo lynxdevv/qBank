@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/paper.dart';
 import '../models/topic.dart';
 import '../models/topic_type.dart';
 import '../providers/progress_provider.dart';
-import '../services/asset_registry.dart';
 import '../services/topic_cache.dart';
 import '../utils/constants.dart';
 import '../widgets/filter_bar.dart';
@@ -13,13 +11,13 @@ import '../widgets/topic_tile.dart';
 import 'topic_detail_screen.dart';
 
 class TopicListScreen extends StatefulWidget {
-  final SubjectDef subject;
-  final Paper paper;
+  final String assetPath;
+  final String unitName;
 
   const TopicListScreen({
     super.key,
-    required this.subject,
-    required this.paper,
+    required this.assetPath,
+    required this.unitName,
   });
 
   @override
@@ -39,25 +37,19 @@ class _TopicListScreenState extends State<TopicListScreen> {
   }
 
   Future<void> _loadTopics() async {
-    final topics = <Topic>[];
-    for (final file in widget.paper.csvFiles) {
-      final path = AssetRegistry.assetPath(
-        widget.subject.directoryName,
-        widget.paper.directoryName,
-        file,
-      );
-      try {
-        final loaded = await TopicCache.instance.get(path);
-        topics.addAll(loaded);
-      } catch (e) {
-        debugPrint('TopicList: error loading $path: $e');
+    try {
+      final loaded = await TopicCache.instance.get(widget.assetPath);
+      if (mounted) {
+        setState(() {
+          _allTopics = loaded;
+          _loading = false;
+        });
       }
-    }
-    if (mounted) {
-      setState(() {
-        _allTopics = topics;
-        _loading = false;
-      });
+    } catch (e) {
+      debugPrint('TopicList: error loading ${widget.assetPath}: $e');
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
@@ -108,7 +100,7 @@ class _TopicListScreenState extends State<TopicListScreen> {
 
     return GradientScaffold(
       appBar: AppBar(
-        title: Text('${widget.subject.displayName} - ${widget.paper.name}'),
+        title: Text(widget.unitName),
         backgroundColor: Colors.transparent,
         elevation: 0,
         bottom: PreferredSize(

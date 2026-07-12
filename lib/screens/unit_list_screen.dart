@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/paper.dart';
 import '../providers/progress_provider.dart';
 import '../services/asset_registry.dart';
 import '../services/topic_cache.dart';
 import '../utils/constants.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/progress_ring.dart';
-import 'unit_list_screen.dart';
+import 'topic_list_screen.dart';
 
-class PaperListScreen extends StatefulWidget {
+class UnitListScreen extends StatefulWidget {
   final SubjectDef subject;
+  final Paper paper;
 
-  const PaperListScreen({super.key, required this.subject});
+  const UnitListScreen({
+    super.key,
+    required this.subject,
+    required this.paper,
+  });
 
   @override
-  State<PaperListScreen> createState() => _PaperListScreenState();
+  State<UnitListScreen> createState() => _UnitListScreenState();
 }
 
-class _PaperListScreenState extends State<PaperListScreen> {
-  final Map<String, List<String>> _paperTopicIds = {};
+class _UnitListScreenState extends State<UnitListScreen> {
+  final Map<String, List<String>> _unitTopicIds = {};
   bool _loading = true;
 
   @override
@@ -28,26 +34,27 @@ class _PaperListScreenState extends State<PaperListScreen> {
   }
 
   Future<void> _loadTopicIds() async {
-    for (final paper in widget.subject.papers) {
-      final ids = <String>[];
-      for (final file in paper.csvFiles) {
-        final path = AssetRegistry.assetPath(
-          widget.subject.directoryName,
-          paper.directoryName,
-          file,
-        );
-        try {
-          final topics = await TopicCache.instance.get(path);
-          ids.addAll(topics.map((t) => t.id));
-        } catch (e) {
-          debugPrint('PaperList: error loading $path: $e');
-        }
+    for (final file in widget.paper.csvFiles) {
+      final path = AssetRegistry.assetPath(
+        widget.subject.directoryName,
+        widget.paper.directoryName,
+        file,
+      );
+      try {
+        final topics = await TopicCache.instance.get(path);
+        _unitTopicIds[file] = topics.map((t) => t.id).toList();
+      } catch (e) {
+        debugPrint('UnitList: error loading $path: $e');
+        _unitTopicIds[file] = [];
       }
-      _paperTopicIds[paper.directoryName] = ids;
     }
     if (mounted) {
       setState(() => _loading = false);
     }
+  }
+
+  String _unitName(String csvFile) {
+    return csvFile.replaceAll('.csv', '');
   }
 
   @override
@@ -56,7 +63,7 @@ class _PaperListScreenState extends State<PaperListScreen> {
 
     return GradientScaffold(
       appBar: AppBar(
-        title: Text(widget.subject.displayName),
+        title: Text('${widget.subject.displayName} - ${widget.paper.name}'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -66,23 +73,27 @@ class _PaperListScreenState extends State<PaperListScreen> {
             )
           : ListView.builder(
               padding: const EdgeInsets.only(top: 16, bottom: 32),
-              itemCount: widget.subject.papers.length,
+              itemCount: widget.paper.csvFiles.length,
               itemBuilder: (context, index) {
-                final paper = widget.subject.papers[index];
-                final topicIds =
-                    _paperTopicIds[paper.directoryName] ?? <String>[];
+                final file = widget.paper.csvFiles[index];
+                final topicIds = _unitTopicIds[file] ?? <String>[];
                 final done = progress.doneCount(topicIds);
                 final total = topicIds.length;
                 final pct = total > 0 ? done / total : 0.0;
 
                 return GestureDetector(
                   onTap: () {
+                    final path = AssetRegistry.assetPath(
+                      widget.subject.directoryName,
+                      widget.paper.directoryName,
+                      file,
+                    );
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => UnitListScreen(
-                          subject: widget.subject,
-                          paper: paper,
+                        builder: (_) => TopicListScreen(
+                          assetPath: path,
+                          unitName: _unitName(file),
                         ),
                       ),
                     );
@@ -106,7 +117,7 @@ class _PaperListScreenState extends State<PaperListScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                paper.name,
+                                _unitName(file),
                                 style: const TextStyle(
                                   color: AppColors.textPrimary,
                                   fontSize: 16,
